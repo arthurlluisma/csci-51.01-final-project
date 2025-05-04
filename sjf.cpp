@@ -73,11 +73,13 @@ int main() {
             processes.erase(chosenProcess);
             continue;
         }
+        
+        idleTime += processToExecute[0]-time;
+        time += (processToExecute[0]-time);
 
         finalOutput.push_back({time, processToExecute[3], processToExecute[1]});
         responseTimes[processToExecute[3]] = time-processToExecute[0];
-        idleTime += processToExecute[0]-time;
-        time += (processToExecute[0]-time)+processToExecute[1];
+        time += processToExecute[1];
         turnaroundTimes[processToExecute[3]] = time-processToExecute[0];
         waitingTimes[processToExecute[3]] = turnaroundTimes[processToExecute[3]]-processToExecute[1];
         processes.erase(chosenProcess);
@@ -90,7 +92,7 @@ int main() {
     long double cpuUtilization = ((long double)time-(long double)idleTime)/(long double)time*100;
     long double throughput = (long double)numProcesses/(long double)time;
     printf("CPU Utilization: %.2Lf%%\n", cpuUtilization);
-    printf("\nThroughput: %.2Lf processes/second\n", throughput);
+    printf("\nThroughput: %.2Lf processes/nanosecond\n", throughput);
 
     long double waitAverage = 0;
     printf("\nWaiting time:\n");
