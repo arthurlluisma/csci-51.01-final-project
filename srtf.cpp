@@ -181,4 +181,6 @@ int main() {
         responseAverage += (long double)responseTimes[i];
     }
     printf("Average response time = %.2Lfns\n", responseAverage/(long double)numProcesses);
+
+    return 0;
 }
