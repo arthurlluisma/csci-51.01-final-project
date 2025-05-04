@@ -118,7 +118,7 @@ int main() {
             finalOutput.push_back({time, processToExecute[3], (*nextProcess)[0]-time, 0});
 
             if (!hasResponded[originalProcessValues[processToExecute[3]][3]]) {
-                responseTimes[originalProcessValues[processToExecute[3]][3]] = time-processToExecute[0];
+                responseTimes[originalProcessValues[processToExecute[3]][3]] = time-originalProcessValues[processToExecute[3]][0];
                 hasResponded[originalProcessValues[processToExecute[3]][3]] = true;
             }
 
