@@ -26,6 +26,7 @@ int main() {
         processes.insert({arrivalTime, burstTime, priority, i+1});
     }
 
+    bool isFirstProcess = true;
     int time = 0, idleTime = 0;
     vector<vector<int>> finalOutput;
     while (!processes.empty()) {
@@ -68,6 +69,9 @@ int main() {
             }
         }
 
+        if (isFirstProcess)
+            time = (*chosenProcess)[0];
+
         multiset<vector<int>>::iterator nextProcess;
         bool preemptProcess = false;
         int nextArrivalTime = -1;
@@ -101,8 +105,14 @@ int main() {
             processes.erase(chosenProcess);
             processes.insert(preemptedProcess);
 
+            if (isFirstProcess) {
+                time = 0;
+                isFirstProcess = false;
+            }
+
             if (!hasArrived) {
                 idleTime += originalProcessValues[processToExecute[3]][0]-time;
+                time = (*chosenProcess)[0];
             }
 
             finalOutput.push_back({time, processToExecute[3], (*nextProcess)[0]-time, 0});
@@ -114,6 +124,11 @@ int main() {
 
             time = (*nextProcess)[0];
         } else {
+            if (isFirstProcess) {
+                time = 0;
+                isFirstProcess = false;
+            }
+
             if (hasArrived) {
                 finalOutput.push_back({time, processToExecute[3], processToExecute[1], 1});
                 
