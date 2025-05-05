@@ -76,20 +76,20 @@ int main()
     {
         printf("Process %i: %ins\n", x+1, waitingTimeList[x]);
     }
-    printf("\nAverage waiting time %.2fns\n", avgWaitingTime);
+    printf("Average waiting time %.2fns\n\n", avgWaitingTime);
     float avgTurnaroundTime = float(totalTurnaroundTime) / float(processes);
     cout << "Turnaround time:" << endl;
     for (int x = 0; x < turnaroundTimeList.size(); x++)
     {
         printf("Process %i: %ins\n", x+1, turnaroundTimeList[x]);
     }
-    printf("\nAverage turnaround time %.2fns\n", avgTurnaroundTime);
+    printf("Average turnaround time %.2fns\n\n", avgTurnaroundTime);
     cout << "Response time:" << endl;
     for (int x = 0; x < waitingTimeList.size(); x++)
     {
         printf("Process %i: %ins\n", x+1, waitingTimeList[x]);
     }
-    printf("Average response time %.2fns\n", avgWaitingTime);
+    printf("Average response time %.2fns\n\n", avgWaitingTime);
 
     return 0;
 }
