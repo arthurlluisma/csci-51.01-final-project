@@ -46,6 +46,7 @@ int main(int argc, char* argv[])
             p.processNum = j + 1;
             inputFile >> p.arrivalTime >> p.burstTime >> p.priority;
             allProcesses.push_back(p);
+            // cout << "Process: " << p.processNum << ", Arrival time: " << p.arrivalTime << ", Burst time: " << p.burstTime << ", priority: " << p.priority << endl;
         }
         while (true)
         {   
@@ -79,22 +80,17 @@ int main(int argc, char* argv[])
             int currentRunningProcess = (*currentProcess)->processNum;
 
             if (currentRunningProcess != lastRunningProcess) {
-                int totalRuntime = currentTime - lastSwitchTime;
-            
                 if (lastProcessPtr != nullptr) {
+                    int duration = currentTime - lastSwitchTime;
                     bool justFinished = (lastProcessPtr->timeSpent == lastProcessPtr->burstTime);
-                    cout << "Time: " << currentTime << ", Now running Process " << currentRunningProcess
-                         << ", CPU time: " << totalRuntime << (justFinished ? "X" : "") << endl;
-                } else {
-                    // First process starting
-                    cout << "Time: " << currentTime << ", Now running Process " << currentRunningProcess
-                         << ", CPU time: 0" << endl;
+                    cout << lastSwitchTime << " " << lastProcessPtr->processNum << " " << duration
+                         << (justFinished ? "X" : "") << endl;
                 }
             
-                lastRunningProcess = currentRunningProcess;
                 lastSwitchTime = currentTime;
+                lastRunningProcess = currentRunningProcess;
                 lastProcessPtr = *currentProcess;
-            }          
+            }         
 
             currentTime++;
 
@@ -104,6 +100,11 @@ int main(int argc, char* argv[])
         
             if (allFinished)
                 break;
+        }
+
+        if (lastProcessPtr != nullptr) { //handles last process, which does not trigger a context switch
+            int duration = currentTime - lastSwitchTime;
+            cout << lastSwitchTime << " " << lastProcessPtr->processNum << " " << duration << "X" << endl;
         }
         currentTime = 0;
         i++;
