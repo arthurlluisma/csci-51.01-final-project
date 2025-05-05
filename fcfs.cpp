@@ -11,6 +11,7 @@ struct Process
     int processIndex;
     int waitingTime;
     int turnaroundTime;  
+    
 };
 
 int main()
@@ -20,9 +21,11 @@ int main()
     float totalBusyTime = 0;
     float totalWaitingTime = 0;
     float totalTurnaroundTime = 0;  
+    string label;
     queue<Process> processQueue;
     ifstream inputfile("input.txt");
-    inputfile >> processes;
+    inputfile >> processes >> label;
+    vector<int> waitingTimeList, turnaroundTimeList;
     
     for (int x = 0; x < processes; x++)
     {
@@ -44,7 +47,6 @@ int main()
             currentTime = p.arrivalTime;
         }
 
-
         p.waitingTime = currentTime - p.arrivalTime;
         
 
@@ -56,22 +58,38 @@ int main()
         currentTime += p.burstTime;
         totalBusyTime += p.burstTime;
         totalWaitingTime += p.waitingTime;
+        waitingTimeList.push_back(p.waitingTime);
         totalTurnaroundTime += p.turnaroundTime;
-        cout << p.waitingTime << endl;
+        turnaroundTimeList.push_back(p.turnaroundTime);
         processQueue.pop();
     }
 
     cout << endl;
 
     float cpuUtilization = (totalBusyTime / currentTime) * 100;
-    printf("CPU Utilization: (%) %.6f\n", cpuUtilization);
+    printf("CPU Utilization: %.2f%\n\n", cpuUtilization);
     float cpuThroughput = float(processes) / float(currentTime);
-    printf("Throughput: (# of processes) completed per unit of time %.6f\n", cpuThroughput);
+    printf("Throughput: %.2f processes/nanosecond\n\n", cpuThroughput);
     float avgWaitingTime = float(totalWaitingTime) / float(processes); 
-    printf("Waiting time: (time) cumulative %.6f\n", avgWaitingTime);
+    cout << "Waiting time:" << endl;
+    for (int x = 0; x < waitingTimeList.size(); x++)
+    {
+        printf("Process %i: %ins\n", x+1, waitingTimeList[x]);
+    }
+    printf("\nAverage waiting time %.2fns\n", avgWaitingTime);
     float avgTurnaroundTime = float(totalTurnaroundTime) / float(processes);
-    printf("Turnaround time: (time) %.6f\n", avgTurnaroundTime);
-    printf("Response time: (time) %.6f\n", avgWaitingTime);
+    cout << "Turnaround time:" << endl;
+    for (int x = 0; x < turnaroundTimeList.size(); x++)
+    {
+        printf("Process %i: %ins\n", x+1, turnaroundTimeList[x]);
+    }
+    printf("\nAverage turnaround time %.2fns\n", avgTurnaroundTime);
+    cout << "Response time:" << endl;
+    for (int x = 0; x < waitingTimeList.size(); x++)
+    {
+        printf("Process %i: %ins\n", x+1, waitingTimeList[x]);
+    }
+    printf("Average response time %.2fns\n", avgWaitingTime);
 
     return 0;
 }
