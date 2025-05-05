@@ -138,25 +138,35 @@ int main(int argc, char* argv[])
         double avgTurnaround = (double)totalTurnaroundTime / processCount;
         double avgResponse = (double)totalResponseTime / processCount;
 
-        printf("CPU Utilization: %f\n", cpuUtil);
-        printf("Throughput: %f\n", throughput);
+        printf("CPU Utilization: %.2f%%\n", cpuUtil);
+        printf("Throughput: %.2f\n", throughput);
+        cout << "Waiting time:" << endl;
+        int waitCounter = 0;
         for (const process& p : allProcesses) {
+            waitCounter++;
             int turnaround = p.timeFinished + 1 - p.arrivalTime;
             int waiting = turnaround - p.burstTime;
-            cout << "Process " << p.processNum << " Waiting time" << ": " << waiting << "ns" << endl;
+            cout << waitCounter << ". Process " << p.processNum << ": " << waiting << "ns" << endl;
         }
-        printf("Average Waiting Time: %fns\n", avgWaiting);
-        for (const process& p : allProcesses) {
-            int turnaround = p.timeFinished + 1 - p.arrivalTime;
-            cout << "Process " << p.processNum << " Turnaround time" << ": " << turnaround << "ns" << endl;
-        }
-        printf("Average Turnaround Time: %fns\n", avgTurnaround);
+        printf("Average waiting time: %.2fns\n", avgWaiting);
 
+        cout << "Turnaround time:" << endl;
+        int turnCounter = 0;
         for (const process& p : allProcesses) {
-            int response = p.timeStart - p.arrivalTime;
-            cout << "Process " << p.processNum << " Response time" << ": " << response << "ns" << endl;
+            turnCounter++;
+            int turnaround = p.timeFinished + 1 - p.arrivalTime;
+            cout << turnCounter << ". Process " << p.processNum << ": " << turnaround << "ns" << endl;
         }
-        printf("Response Time: %fns\n", avgResponse);
+        printf("Average turnaround time: %.2fns\n", avgTurnaround);
+
+        cout << "Response time:" << endl;
+        int resCounter = 0;
+        for (const process& p : allProcesses) {
+            resCounter++;
+            int response = p.timeStart - p.arrivalTime;
+            cout << resCounter << ". Process " << p.processNum << ": " << response << "ns" << endl;
+        }
+        printf("Average response time: %.2fns\n", avgResponse);
 
         currentTime = 0; //resets everything for next test case
         i++;
