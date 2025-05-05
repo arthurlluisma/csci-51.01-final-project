@@ -46,6 +46,7 @@ int main(int argc, char* argv[])
         {
             p.processNum = j + 1;
             inputFile >> p.arrivalTime >> p.burstTime >> p.priority;
+            // cout << "Process Number: " << p.processNum << ", Priority: " << p.priority << endl;
             allProcesses.push_back(p);
         }
         while (true)
@@ -145,7 +146,16 @@ int main(int argc, char* argv[])
             cout << "Process " << p.processNum << " Waiting time" << ": " << waiting << "ns" << endl;
         }
         printf("Average Waiting Time: %fns\n", avgWaiting);
-        printf("Turnaround Time: %fns\n", avgTurnaround);
+        for (const process& p : allProcesses) {
+            int turnaround = p.timeFinished + 1 - p.arrivalTime;
+            cout << "Process " << p.processNum << " Turnaround time" << ": " << turnaround << "ns" << endl;
+        }
+        printf("Average Turnaround Time: %fns\n", avgTurnaround);
+
+        for (const process& p : allProcesses) {
+            int response = p.timeStart - p.arrivalTime;
+            cout << "Process " << p.processNum << " Response time" << ": " << response << "ns" << endl;
+        }
         printf("Response Time: %fns\n", avgResponse);
 
         currentTime = 0; //resets everything for next test case
