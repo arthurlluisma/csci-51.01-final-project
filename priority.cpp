@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
     list<process*> processList;
     list<process> allProcesses;
 
-    ifstream inputFile("textinput.txt"); //reference: https://devdocs.io/cpp/io/c
+    ifstream inputFile(argv[1]); //reference: https://devdocs.io/cpp/io/c
     inputFile >> numOfTestCases >> numOfProcesses >> scheduleType;
     
     int i = 0;
@@ -47,7 +47,6 @@ int main(int argc, char* argv[])
             p.processNum = j + 1;
             inputFile >> p.arrivalTime >> p.burstTime >> p.priority;
             allProcesses.push_back(p);
-            cout << p.processNum << p.burstTime << p.arrivalTime << p.priority << endl;
         }
         while (true)
         {   
@@ -69,34 +68,33 @@ int main(int argc, char* argv[])
             { //looks for highest priority process not yet done
                 return p->timeSpent < p->burstTime; //reference: https://cplusplus.com/reference/algorithm/find_if/
             });
-
-            if ((*currentProcess)->timeStart == -1) {
-                (*currentProcess)->timeStart = currentTime;
-            }
             
             if(currentProcess != processList.end())
             {
+                if ((*currentProcess)->timeStart == -1) {
+                    (*currentProcess)->timeStart = currentTime;
+                }
                 (*currentProcess)->timeSpent += 1;
                 
                 if((*currentProcess)->timeSpent == (*currentProcess)->burstTime)
                 {
                     (*currentProcess)->timeFinished = currentTime;
                 }
-            }
 
-            int currentRunningProcess = (*currentProcess)->processNum;
+                int currentRunningProcess = (*currentProcess)->processNum;
 
-            if (currentRunningProcess != lastRunningProcess) {
-                if (lastProcessPtr != nullptr) {
-                    int duration = currentTime - lastSwitchTime;
-                    bool justFinished = (lastProcessPtr->timeSpent == lastProcessPtr->burstTime);
-                    cout << lastSwitchTime << " " << lastProcessPtr->processNum << " " << duration
-                         << (justFinished ? "X" : "") << endl;
+                if (currentRunningProcess != lastRunningProcess) {
+                    if (lastProcessPtr != nullptr) {
+                        int duration = currentTime - lastSwitchTime;
+                        bool justFinished = (lastProcessPtr->timeSpent == lastProcessPtr->burstTime);
+                        cout << lastSwitchTime << " " << lastProcessPtr->processNum << " " << duration
+                            << (justFinished ? "X" : "") << endl;
+                    }
+                
+                    lastSwitchTime = currentTime;
+                    lastRunningProcess = currentRunningProcess;
+                    lastProcessPtr = *currentProcess;
                 }
-            
-                lastSwitchTime = currentTime;
-                lastRunningProcess = currentRunningProcess;
-                lastProcessPtr = *currentProcess;
             }         
 
             currentTime++;
