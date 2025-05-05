@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <cstdio>
 #include <iostream>
+#include <fstream>
 #include <set>
 #include <vector>
 #include <algorithm>
@@ -28,7 +29,8 @@ bool compareArrival(Process a, Process b) {
     return a.arrivalTime < b.arrivalTime;
 }
 
-void fcfs(int numProcesses) {
+void fcfs(int numProcesses, char* input[]) {
+    ifstream inputFile(input[1]);
     int currentTime = 0;
     float totalBusyTime = 0;
     float totalWaitingTime = 0;
@@ -41,7 +43,7 @@ void fcfs(int numProcesses) {
     {
         Process processInput;
         processInput.processIndex = x + 1;
-        cin >> processInput.arrivalTime >> processInput.burstTime >> processInput.priority;
+        inputFile >> processInput.arrivalTime >> processInput.burstTime >> processInput.priority;
         processInput.waitingTime = 0; 
         processInput.turnaroundTime = 0; 
         allProcesses.push_back(processInput);
@@ -106,13 +108,14 @@ void fcfs(int numProcesses) {
     printf("Average response time %.2fns\n", avgWaitingTime);
 }
 
-void roundRobin(int numProcesses, int timeQuantum) {
+void roundRobin(int numProcesses, int timeQuantum, char* input[]) {
+    ifstream inputFile(input[1]);
     vector<int> waitingTimeList, turnaroundTimeList, responseTimeList;
 
     vector<Process> allProcesses;
     for (int i = 0; i < numProcesses; i++) {
         Process p;
-        cin >> p.arrivalTime >> p.burstTime >> p.priority;
+        inputFile >> p.arrivalTime >> p.burstTime >> p.priority;
         p.processIndex = i + 1;
         p.remainingTime = p.burstTime;
         p.waitingTime = 0;
@@ -205,7 +208,8 @@ void roundRobin(int numProcesses, int timeQuantum) {
     printf("Average response time %.2fns\n", avgWaitingTime);
 }
 
-void priority(int numProcesses) {
+void priority(int numProcesses, char* input[]) {
+    ifstream inputFile(input[1]);
     int currentTime = 0;
     int lastRunningProcess = -1;
     int lastSwitchTime = 0;
@@ -218,7 +222,7 @@ void priority(int numProcesses) {
     for (int j = 0; j < numProcesses; ++j)
     {
         p.processIndex = j + 1;
-        cin >> p.arrivalTime >> p.burstTime >> p.priority;
+        inputFile >> p.arrivalTime >> p.burstTime >> p.priority;
         allProcesses.push_back(p);
     }
     while (true)
@@ -335,7 +339,8 @@ void priority(int numProcesses) {
     printf("Average response time: %.2fns\n", avgResponse);
 }
 
-void sjf(int numProcesses) {
+void sjf(int numProcesses, char* input[]) {
+    ifstream inputFile(input[1]);
     multiset<vector<int>> processes;
     vector<int> waitingTimes, turnaroundTimes, responseTimes;
 
@@ -344,7 +349,7 @@ void sjf(int numProcesses) {
     responseTimes.resize(numProcesses+1);
     for (int i = 0; i < numProcesses; i++) {
         int arrivalTime, burstTime, priority;
-        cin >> arrivalTime >> burstTime >> priority;
+        inputFile >> arrivalTime >> burstTime >> priority;
         processes.insert({arrivalTime, burstTime, priority, i+1});
     }
 
@@ -446,7 +451,8 @@ void sjf(int numProcesses) {
     printf("Average response time = %.2Lfns\n", responseAverage/(long double)numProcesses);
 }
 
-void srtf(int numProcesses) {
+void srtf(int numProcesses, char* input[]) {
+    ifstream inputFile(input[1]);
     vector<vector<int>> originalProcessValues;
     multiset<vector<int>> processes;
     vector<bool> hasResponded;
@@ -459,7 +465,7 @@ void srtf(int numProcesses) {
     responseTimes.resize(numProcesses+1);
     for (int i = 0; i < numProcesses; i++) {
         int arrivalTime, burstTime, priority;
-        cin >> arrivalTime >> burstTime >> priority;
+        inputFile >> arrivalTime >> burstTime >> priority;
         originalProcessValues[i+1] = {arrivalTime, burstTime, priority, i+1};
         processes.insert({arrivalTime, burstTime, priority, i+1});
     }
@@ -636,32 +642,34 @@ void srtf(int numProcesses) {
     printf("Average response time = %.2Lfns\n", responseAverage/(long double)numProcesses);
 }
 
-void solveTestCases(int testCase) {
+void solveTestCases(int testCase, char* input[]) {
     int numProcess;
     int timeQuantum;
     string schedulingAlgorithm;
-    cin >> numProcess >> schedulingAlgorithm;
+    ifstream inputFile(input[1]);
+    inputFile >> numProcess >> schedulingAlgorithm;
 
     cout << testCase << endl;
     if (schedulingAlgorithm == "FCFS") {
-        fcfs(numProcess);
+        fcfs(numProcess, input);
     } else if (schedulingAlgorithm == "RR") {
-        cin >> timeQuantum;
-        roundRobin(numProcess, timeQuantum);
+        inputFile >> timeQuantum;
+        roundRobin(numProcess, timeQuantum, input);
     } else if (schedulingAlgorithm == "P") {
-        priority(numProcess);
+        priority(numProcess, input);
     } else if (schedulingAlgorithm == "SJF") {
-        sjf(numProcess);
+        sjf(numProcess, input);
     } else {
-        srtf(numProcess);
+        srtf(numProcess, input);
     }
 }
 
-int main() {
-    int t; cin >> t;
+int main(int argc, char* argv[]) {
+    ifstream inputFile(argv[1]);
+    int t; inputFile >> t;
     int i = 1;
     while (t--) {
-        solveTestCases(i);
+        solveTestCases(i, argv);
         i++;
         if (t > 0)
             cout << endl;
