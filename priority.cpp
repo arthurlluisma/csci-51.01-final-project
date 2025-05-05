@@ -37,9 +37,11 @@ int main(int argc, char* argv[])
     int k = 0;
     while (i < numOfTestCases)
     {
+        printf("Test Case #%i\n", i+1);
         for (int j = 0; j < numOfProcesses; ++j) //stores all processes in a list
         {
-            inputFile >> p.processNum >> p.arrivalTime >> p.burstTime >> p.priority;
+            p.processNum = j + 1;
+            inputFile >> p.arrivalTime >> p.burstTime >> p.priority;
             allProcesses.push_back(p);
         }
         while (currentTime < 20)
