@@ -25,9 +25,12 @@ int main(int argc, char* argv[])
     int numOfProcesses;
     char scheduleType;
     int currentTime = 0;
+    int lastRunningProcess = -1;
+    int lastSwitchTime = 0;
+    process* lastProcessPtr = nullptr;
 
     process p;
-    list<process> processList;
+    list<process*> processList;
     list<process> allProcesses;
 
     ifstream inputFile("textinput.txt"); //reference: https://devdocs.io/cpp/io/c
@@ -44,63 +47,70 @@ int main(int argc, char* argv[])
             inputFile >> p.arrivalTime >> p.burstTime >> p.priority;
             allProcesses.push_back(p);
         }
-        while (currentTime < 20)
+        while (true)
         {   
-            for (process q : allProcesses)
+            for (process& q : allProcesses)
             {
                 if(q.arrivalTime == currentTime) //adds process into queue if correct time
                 {   
                     q.timeAdded = currentTime;
-                    processList.push_back(q);
+                    processList.push_back(&q);
                 }
             }
 
-            processList.sort([](const process& a, const process& b) { //sorts the list in decreasing priority
-                return a.priority > b.priority; //reference: https://cplusplus.com/reference/list/list/sort/
+            processList.sort([](const process* a, const process* b) { //sorts the list in decreasing priority
+                return a->priority > b->priority; //reference: https://cplusplus.com/reference/list/list/sort/
             });
-            
-            printf("Current Time %ins\n",currentTime);
 
-            for(process q : processList) //prints out every process in queue
-            {
-                cout << "Process " << q.processNum
-                << ": Arrival=" << q.arrivalTime
-                << ", Burst=" << q.burstTime
-                << ", Priority=" << q.priority
-                << ", Time Added=" << q.timeAdded 
-                << ", Time Finished=" << q.timeFinished;
-                if(q.timeSpent == q.burstTime)
-                {
-                   cout << ", Time Spent=" << q.timeSpent << "X" << endl;
-                }
-                else
-                {
-                   cout << ", Time Spent=" << q.timeSpent << endl;
-                }
-                
-            }
-
-            auto currentProcess = find_if(processList.begin(), processList.end(), [](const process& p) { //looks for highest priority process not yet done
-                return p.timeSpent < p.burstTime; //reference: https://cplusplus.com/reference/algorithm/find_if/
+            auto currentProcess = find_if(processList.begin(), processList.end(), [](const process* p) { //looks for highest priority process not yet done
+                return p->timeSpent < p->burstTime; //reference: https://cplusplus.com/reference/algorithm/find_if/
             });
             
             if(currentProcess != processList.end())
             {
-                currentProcess->timeSpent += 1;
-
-    
-                if(currentProcess->timeSpent == currentProcess->burstTime)
+                (*currentProcess)->timeSpent += 1;
+                
+                if((*currentProcess)->timeSpent == (*currentProcess)->burstTime)
                 {
-                    currentProcess->timeFinished = currentTime;
+                    (*currentProcess)->timeFinished = currentTime;
                 }
             }
 
+            int currentRunningProcess = (*currentProcess)->processNum;
+
+            if (currentRunningProcess != lastRunningProcess) {
+                int totalRuntime = currentTime - lastSwitchTime;
+            
+                if (lastProcessPtr != nullptr) {
+                    bool justFinished = (lastProcessPtr->timeSpent == lastProcessPtr->burstTime);
+                    cout << "Time: " << currentTime << ", Now running Process " << currentRunningProcess
+                         << ", CPU time: " << totalRuntime << (justFinished ? "X" : "") << endl;
+                } else {
+                    // First process starting
+                    cout << "Time: " << currentTime << ", Now running Process " << currentRunningProcess
+                         << ", CPU time: 0" << endl;
+                }
+            
+                lastRunningProcess = currentRunningProcess;
+                lastSwitchTime = currentTime;
+                lastProcessPtr = *currentProcess;
+            }          
+
             currentTime++;
 
+            bool allFinished = all_of(allProcesses.begin(), allProcesses.end(), [](const process& p) { //Check if all processes are finished
+                return p.timeSpent >= p.burstTime; //reference: https://cplusplus.com/reference/algorithm/all_of/
+            });
+        
+            if (allFinished)
+                break;
         }
         currentTime = 0;
         i++;
         inputFile >> numOfProcesses >> scheduleType;
+        lastSwitchTime = 0;
+        lastRunningProcess = -1;
+        lastProcessPtr = nullptr;
         allProcesses.clear();
         processList.clear();
     }
