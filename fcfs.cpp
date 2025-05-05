@@ -2,6 +2,7 @@ using namespace std;
 #include <iostream>
 #include <fstream>
 #include <queue>
+#include <algorithm>
 
 struct Process
 {
@@ -13,6 +14,10 @@ struct Process
     int turnaroundTime;  
     
 };
+
+bool compareArrival(Process a, Process b) {
+    return a.arrivalTime < b.arrivalTime;
+}
 
 int main()
 {
@@ -26,6 +31,10 @@ int main()
     ifstream inputfile("input.txt");
     inputfile >> processes >> label;
     vector<int> waitingTimeList, turnaroundTimeList;
+    vector<Process> allProcesses;
+
+    
+    
     
     for (int x = 0; x < processes; x++)
     {
@@ -34,7 +43,14 @@ int main()
         inputfile >> processInput.arrivalTime >> processInput.burstTime >> processInput.priority;
         processInput.waitingTime = 0; 
         processInput.turnaroundTime = 0; 
-        processQueue.push(processInput);
+        allProcesses.push_back(processInput);
+    }
+
+    sort(allProcesses.begin(), allProcesses.end(), compareArrival);
+
+    for (int x = 0; x < processes; x++)
+    {
+        processQueue.push(allProcesses[x]);
     }
 
     while (!processQueue.empty())
