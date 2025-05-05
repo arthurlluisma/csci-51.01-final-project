@@ -17,6 +17,7 @@ struct process {
     int timeAdded; //for debugging purposes
     int timeSpent = 0;
     int timeFinished; //for debugging purposes
+    int timeStart = -1;
 };
 
 int main(int argc, char* argv[])
@@ -40,13 +41,13 @@ int main(int argc, char* argv[])
     int k = 0;
     while (i < numOfTestCases)
     {
-        printf("Test Case #%i\n", i+1);
+        cout << i+1 << endl;
         for (int j = 0; j < numOfProcesses; ++j) //stores all processes in a list
         {
             p.processNum = j + 1;
             inputFile >> p.arrivalTime >> p.burstTime >> p.priority;
             allProcesses.push_back(p);
-            // cout << "Process: " << p.processNum << ", Arrival time: " << p.arrivalTime << ", Burst time: " << p.burstTime << ", priority: " << p.priority << endl;
+            cout << p.processNum << p.burstTime << p.arrivalTime << p.priority << endl;
         }
         while (true)
         {   
@@ -59,13 +60,19 @@ int main(int argc, char* argv[])
                 }
             }
 
-            processList.sort([](const process* a, const process* b) { //sorts the list in decreasing priority
+            processList.sort([](const process* a, const process* b) 
+            { //sorts the list in decreasing priority
                 return a->priority > b->priority; //reference: https://cplusplus.com/reference/list/list/sort/
             });
 
-            auto currentProcess = find_if(processList.begin(), processList.end(), [](const process* p) { //looks for highest priority process not yet done
+            auto currentProcess = find_if(processList.begin(), processList.end(), [](const process* p) 
+            { //looks for highest priority process not yet done
                 return p->timeSpent < p->burstTime; //reference: https://cplusplus.com/reference/algorithm/find_if/
             });
+
+            if ((*currentProcess)->timeStart == -1) {
+                (*currentProcess)->timeStart = currentTime;
+            }
             
             if(currentProcess != processList.end())
             {
@@ -106,7 +113,44 @@ int main(int argc, char* argv[])
             int duration = currentTime - lastSwitchTime;
             cout << lastSwitchTime << " " << lastProcessPtr->processNum << " " << duration << "X" << endl;
         }
-        currentTime = 0;
+
+        int totalBurstTime = 0;
+        int totalTurnaroundTime = 0;
+        int totalWaitingTime = 0;
+        int totalResponseTime = 0;
+        int totalTime = currentTime;
+
+        for (const process& p : allProcesses) {
+            int turnaround = p.timeFinished + 1 - p.arrivalTime;
+            int waiting = turnaround - p.burstTime;
+            int response = p.timeStart - p.arrivalTime;
+        
+            totalBurstTime += p.burstTime;
+            totalTurnaroundTime += turnaround;
+            totalWaitingTime += waiting;
+            totalResponseTime += response;
+        }
+
+        int processCount = allProcesses.size();
+
+        double cpuUtil = (double)totalBurstTime / totalTime * 100.0;
+        double throughput = (double)processCount / totalTime;
+        double avgWaiting = (double)totalWaitingTime / processCount;
+        double avgTurnaround = (double)totalTurnaroundTime / processCount;
+        double avgResponse = (double)totalResponseTime / processCount;
+
+        printf("CPU Utilization: %f\n", cpuUtil);
+        printf("Throughput: %f\n", throughput);
+        for (const process& p : allProcesses) {
+            int turnaround = p.timeFinished + 1 - p.arrivalTime;
+            int waiting = turnaround - p.burstTime;
+            cout << "Process " << p.processNum << " Waiting time" << ": " << waiting << "ns" << endl;
+        }
+        printf("Average Waiting Time: %fns\n", avgWaiting);
+        printf("Turnaround Time: %fns\n", avgTurnaround);
+        printf("Response Time: %fns\n", avgResponse);
+
+        currentTime = 0; //resets everything for next test case
         i++;
         inputFile >> numOfProcesses >> scheduleType;
         lastSwitchTime = 0;
